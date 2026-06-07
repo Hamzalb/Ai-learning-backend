@@ -7,6 +7,7 @@ const Document = makeModel('Document', {
   originalName: '',
   fileUrl: '',
   fileSize: 0,
+  size: 0,
   mimeType: '',
   extractedText: '',
   pageCount: 1,
@@ -15,7 +16,14 @@ const Document = makeModel('Document', {
   processingStatus: 'pending',
   summary: null,
   keywords: [],
-  userId: null
+  userId: null,
+  // School management fields
+  classroomId: null,
+  teacherId: null,
+  schoolId: null,
+  visibility: 'all', // 'all' | studentId[]
+  category: 'lecture', // lecture | assignment | resource | exam
+  isProtected: true
 });
 
 module.exports = Document;

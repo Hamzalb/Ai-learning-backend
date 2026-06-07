@@ -6,9 +6,12 @@ const User = makeModel('User', {
   name: '',
   email: '',
   password: '',
-  role: 'student',
+  role: 'student', // super_admin | school | principal | teacher | student
+  schoolId: null,
+  isActive: true,
   avatar: null,
-  isVerified: false,
+  phone: '',
+  // Legacy AI-learning fields kept for existing functionality
   streak: 0,
   lastActive: null,
   xp: 0,
@@ -18,7 +21,6 @@ const User = makeModel('User', {
   stats: { totalQuizzes: 0, totalChats: 0, totalDocuments: 0, averageScore: 0 }
 }, {
   preSave: async (raw) => {
-    // Hash password if it looks plain-text
     if (raw.password && !raw.password.startsWith('$2')) {
       raw.password = await bcrypt.hash(raw.password, 12);
     }
