@@ -120,9 +120,16 @@ const upsertSchedule = async (req, res) => {
   sendSuccess(res, { schedule });
 };
 
+const getPayslips = async (req, res) => {
+  const Payment = require('../models/Payment');
+  const payslips = await Payment.find({ studentId: String(req.user._id) });
+  sendSuccess(res, { payslips });
+};
+
 module.exports = {
   getDashboardStats,
   getClassrooms, createClassroom, updateClassroom, deleteClassroom, assignStudents, assignTeacher, getClassroomRoster,
   getSubjects, createSubject, updateSubject, deleteSubject,
-  getSchedule, upsertSchedule
+  getSchedule, upsertSchedule,
+  getPayslips
 };

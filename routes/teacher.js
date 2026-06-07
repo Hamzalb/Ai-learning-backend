@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
+const { validateZod, schemas } = require('../middleware/validateZod');
 const ctrl = require('../controllers/teacherController');
 
 router.use(protect, authorize('teacher'));
@@ -11,7 +12,7 @@ router.get('/classes', ctrl.getMyClasses);
 router.get('/classes/:id/roster', ctrl.getClassRoster);
 
 router.get('/grades', ctrl.getGrades);
-router.post('/grades', ctrl.createGrade);
+router.post('/grades', validateZod(schemas.createGradeSchema), ctrl.createGrade);
 router.put('/grades/:id', ctrl.updateGrade);
 router.delete('/grades/:id', ctrl.deleteGrade);
 
@@ -20,13 +21,13 @@ router.post('/documents', ctrl.uploadDocument);
 router.delete('/documents/:id', ctrl.deleteDocument);
 
 router.get('/quizzes', ctrl.getQuizzes);
-router.post('/quizzes', ctrl.createQuiz);
+router.post('/quizzes', validateZod(schemas.createQuizSchema), ctrl.createQuiz);
 router.put('/quizzes/:id', ctrl.updateQuiz);
 router.delete('/quizzes/:id', ctrl.deleteQuiz);
 router.get('/quizzes/:id/submissions', ctrl.getQuizSubmissions);
 
 router.get('/homework', ctrl.getHomework);
-router.post('/homework', ctrl.createHomework);
+router.post('/homework', validateZod(schemas.createHomeworkSchema), ctrl.createHomework);
 
 router.get('/payslips', ctrl.getPayslips);
 
