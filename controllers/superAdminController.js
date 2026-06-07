@@ -93,15 +93,23 @@ const getUsers = async (req, res) => {
   sendSuccess(res, { users });
 };
 
+const ROLE_DEFAULT_PASSWORDS = {
+  teacher: 'Teacher@123',
+  student: 'Student@123',
+  principal: 'Principal@123',
+  school: 'School@123'
+};
+
 const createUser = async (req, res) => {
-  const { name, email, password, role, schoolId } = req.body;
+  const { name, email, password, role, schoolId, phone } = req.body;
   const allowedRoles = ['school', 'principal', 'teacher', 'student'];
   if (!allowedRoles.includes(role)) return sendError(res, 'Invalid role.', 400);
   const existing = await User.findOne({ email });
   if (existing) return sendError(res, 'Email already in use.', 400);
-  const user = await User.create({ name, email, password: password || 'School@123', role, schoolId, isActive: true });
+  const defaultPassword = ROLE_DEFAULT_PASSWORDS[role] || 'School@123';
+  const user = await User.create({ name, email, password: password || defaultPassword, role, schoolId, phone, isActive: true });
   await log(req.user, `CREATE_${role.toUpperCase()}`, user._id, 'User', { name, email, role });
-  sendSuccess(res, { user }, 'User created.', 201);
+  sendSuccess(res, { user, defaultPassword: password ? null : defaultPassword }, 'User created.', 201);
 };
 
 const getUser = async (req, res) => {

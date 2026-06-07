@@ -55,7 +55,8 @@ const createUserSchema = z.object({
   email,
   role: z.enum(['teacher', 'student', 'principal', 'school'], { errorMap: () => ({ message: 'Invalid role' }) }),
   schoolId: z.string().optional(),
-  phone: z.string().optional()
+  phone: z.string().optional(),
+  password: z.string().min(6).optional()
 });
 
 // ─── Principal ────────────────────────────────────────────────────────────────
@@ -121,7 +122,8 @@ const createHomeworkSchema = z.object({
 const schoolCreateMemberSchema = z.object({
   name: str('Name'),
   email,
-  phone: z.string().optional()
+  phone: z.string().optional(),
+  password: z.string().min(6).optional()
 });
 
 module.exports = {
