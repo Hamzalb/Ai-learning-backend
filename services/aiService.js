@@ -2,6 +2,7 @@ const OpenAI = require('openai');
 
 const isDemoMode = !process.env.OPENAI_API_KEY ||
   process.env.OPENAI_API_KEY.includes('placeholder') ||
+  process.env.OPENAI_API_KEY.includes('your') ||
   process.env.OPENAI_API_KEY === 'sk-placeholder-add-your-real-key-here';
 
 const openai = isDemoMode ? null : new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
