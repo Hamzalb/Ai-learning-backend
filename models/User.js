@@ -1,43 +1,51 @@
 'use strict';
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { makeModel } = require('../lib/memstore');
 
-const User = makeModel('User', {
-  name: '',
-  email: '',
-  password: '',
-  role: 'student', // super_admin | school | principal | teacher | student
-  schoolId: null,
-  isActive: true,
-  avatar: null,
-  phone: '',
-  // Legacy AI-learning fields kept for existing functionality
-  streak: 0,
-  lastActive: null,
-  xp: 0,
-  level: 1,
-  badges: [],
-  preferences: { language: 'arabic', theme: 'dark', difficulty: 'beginner' },
-  stats: { totalQuizzes: 0, totalChats: 0, totalDocuments: 0, averageScore: 0 }
-}, {
-  preSave: async (raw) => {
-    if (raw.password && !raw.password.startsWith('$2')) {
-      raw.password = await bcrypt.hash(raw.password, 12);
-    }
-    if (!raw.lastActive) raw.lastActive = new Date();
+const userSchema = new mongoose.Schema({
+  name:     { type: String, required: true, trim: true },
+  email:    { type: String, required: true, unique: true, lowercase: true, trim: true },
+  password: { type: String, required: true, select: false },
+  role:     { type: String, enum: ['super_admin','school','principal','teacher','student'], default: 'student' },
+  schoolId: { type: mongoose.Schema.Types.ObjectId, ref: 'School', default: null },
+  isActive: { type: Boolean, default: true },
+  avatar:   { type: String, default: null },
+  phone:    { type: String, default: '' },
+  // Legacy AI-learning fields
+  streak:   { type: Number, default: 0 },
+  lastActive: { type: Date, default: Date.now },
+  xp:       { type: Number, default: 0 },
+  level:    { type: Number, default: 1 },
+  badges:   { type: [String], default: [] },
+  preferences: {
+    language:   { type: String, default: 'arabic' },
+    theme:      { type: String, default: 'dark' },
+    difficulty: { type: String, default: 'beginner' }
   },
-  afterWrap: (doc) => {
-    doc.comparePassword = (candidate) => bcrypt.compare(candidate, doc.password);
-    const origToJSON = doc.toJSON.bind(doc);
-    doc.toJSON = () => {
-      const o = origToJSON();
-      delete o.password;
-      delete o.verificationToken;
-      delete o.resetPasswordToken;
-      delete o.resetPasswordExpires;
-      return o;
-    };
+  stats: {
+    totalQuizzes:   { type: Number, default: 0 },
+    totalChats:     { type: Number, default: 0 },
+    totalDocuments: { type: Number, default: 0 },
+    averageScore:   { type: Number, default: 0 }
   }
+}, { timestamps: true });
+
+// Hash password before save
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
 });
 
-module.exports = User;
+// Strip password from JSON output
+userSchema.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
+
+userSchema.methods.comparePassword = function (candidate) {
+  return bcrypt.compare(candidate, this.password);
+};
+
+module.exports = mongoose.models.User || mongoose.model('User', userSchema);
