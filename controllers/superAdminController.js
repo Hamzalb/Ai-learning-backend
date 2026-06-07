@@ -38,7 +38,7 @@ const createSchool = async (req, res) => {
     email: contactEmail,
     password: 'School@123',
     role: 'school',
-    schoolId: String(school._id),
+    schoolId: school._id,          // pass ObjectId directly, not a string
     isActive: true
   });
 
@@ -101,7 +101,8 @@ const ROLE_DEFAULT_PASSWORDS = {
 };
 
 const createUser = async (req, res) => {
-  const { name, email, password, role, schoolId, phone } = req.body;
+  const { name, email, password, role, phone } = req.body;
+  const schoolId = req.body.schoolId || null;   // never pass empty string to Mongoose ObjectId
   const allowedRoles = ['school', 'principal', 'teacher', 'student'];
   if (!allowedRoles.includes(role)) return sendError(res, 'Invalid role.', 400);
   const existing = await User.findOne({ email });

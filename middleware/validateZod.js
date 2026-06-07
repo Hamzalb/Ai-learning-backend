@@ -54,7 +54,7 @@ const createUserSchema = z.object({
   name: str('Name'),
   email,
   role: z.enum(['teacher', 'student', 'principal', 'school'], { errorMap: () => ({ message: 'Invalid role' }) }),
-  schoolId: z.string().optional(),
+  schoolId: z.string().optional().transform(v => v || undefined),
   phone: z.string().optional(),
   password: z.string().min(6).optional()
 });
