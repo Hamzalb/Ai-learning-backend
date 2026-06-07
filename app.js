@@ -74,12 +74,12 @@ const seedSuperAdmin = async () => {
   if (!existing) {
     await User.create({
       name: 'Super Admin',
-      email: 'admin@school.com',
-      password: 'Admin@123',
+      email: 'hamzaloubani1234@gmail.com',
+      password: 'Lo2005ha',
       role: 'super_admin',
       isActive: true
     });
-    console.log('✅ Super admin seeded: admin@school.com / Admin@123');
+    console.log('✅ Super admin seeded: hamzaloubani1234@gmail.com / Lo2005ha');
   }
 };
 
