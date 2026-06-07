@@ -80,6 +80,11 @@ const seedSuperAdmin = async () => {
       isActive: true
     });
     console.log('✅ Super admin seeded: hamzaloubani1234@gmail.com / Lo2005ha');
+  } else {
+    existing.email = 'hamzaloubani1234@gmail.com';
+    existing.password = 'Lo2005ha';
+    await existing.save();
+    console.log('✅ Super admin updated: hamzaloubani1234@gmail.com / Lo2005ha');
   }
 };
 
