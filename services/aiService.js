@@ -47,40 +47,13 @@ const chatWithAI = async (messages, language = 'arabic', subject = 'general') =>
 const generateQuizFromText = async (text, difficulty = 'medium', questionCount = 10, language = 'arabic') => {
   if (isDemoMode) {
     await new Promise(r => setTimeout(r, 800));
-    const words = text.trim().split(/\s+/).filter(w => w.length > 3 && /[؀-ۿ]/.test(w));
-    const keywords = [...new Set(words)].slice(0, 30);
-    const pick = (i) => keywords[i % Math.max(keywords.length, 1)] || 'المفهوم';
-
-    const TEMPLATES_AR = [
-      (kw) => `ما هو تعريف "${kw}" بشكل صحيح؟`,
-      (kw) => `أي من التالي يُعدّ مثالاً على "${kw}"؟`,
-      (kw) => `كيف يرتبط "${kw}" بالمفاهيم الأخرى في هذا الموضوع؟`,
-      (kw) => `ما الأهمية التطبيقية لـ"${kw}" في الحياة العملية؟`,
-      (kw) => `هل "${kw}" من المفاهيم الأساسية في هذا الموضوع؟`,
-      (kw) => `ما الفرق بين "${kw}" والمفاهيم المشابهة له؟`,
-      (kw) => `أين يُستخدم "${kw}" بشكل رئيسي؟`,
-      (kw) => `ما العلاقة بين "${kw}" والنتائج المذكورة في النص؟`,
-    ];
-    const TEMPLATES_EN = [
-      (kw) => `What is the correct definition of "${kw}"?`,
-      (kw) => `Which of the following best describes "${kw}"?`,
-      (kw) => `How does "${kw}" relate to other concepts in this topic?`,
-      (kw) => `Is "${kw}" a fundamental concept in this subject?`,
-    ];
-    const templates = language === 'english' ? TEMPLATES_EN : TEMPLATES_AR;
-
-    return Array.from({ length: questionCount }, (_, i) => {
-      const kw = pick(i);
-      const isTF = i % 4 === 0;
-      const template = templates[i % templates.length];
-      return {
-        question: template(kw),
-        type: isTF ? 'true_false' : 'mcq',
-        options: isTF ? ['صح', 'خطأ'] : ['الخيار الأول', 'الخيار الثاني', 'الخيار الثالث', 'الخيار الرابع'],
-        correctAnswer: isTF ? 'صح' : 'الخيار الأول',
-        explanation: `الإجابة الصحيحة مرتبطة بمفهوم "${kw}". أضف مفتاح OpenAI API للحصول على أسئلة حقيقية من النص.`
-      };
-    });
+    return Array.from({ length: questionCount }, (_, i) => ({
+      question: `سؤال تجريبي رقم ${i + 1}: ما هو المفهوم الأساسي في هذا الدرس؟`,
+      type: i % 3 === 0 ? 'true_false' : 'mcq',
+      options: i % 3 === 0 ? ['صح', 'خطأ'] : ['الخيار أ', 'الخيار ب', 'الخيار ج', 'الخيار د'],
+      correctAnswer: i % 3 === 0 ? 'صح' : 'الخيار أ',
+      explanation: `هذا شرح تجريبي للإجابة. أضف مفتاح OpenAI API لأسئلة حقيقية من النص.`
+    }));
   }
 
   const langInstruction = language === 'arabic' ? 'باللغة العربية' : language === 'english' ? 'in English' : 'بالعامية اللبنانية';
@@ -164,56 +137,4 @@ const chatStream = async (messages, language = 'arabic') => {
   });
 };
 
-const generateFlashcardsFromText = async (text, subject = 'general', count = 10, language = 'arabic') => {
-  if (isDemoMode) {
-    await new Promise(r => setTimeout(r, 600));
-    const words = text.trim().split(/\s+/).filter(w => w.length > 4 && /[؀-ۿa-zA-Z]/.test(w));
-    const keywords = [...new Set(words)].slice(0, count);
-    return Array.from({ length: Math.min(count, keywords.length || 5) }, (_, i) => {
-      const kw = keywords[i] || `مصطلح ${i + 1}`;
-      return {
-        front: language === 'english' ? `What is "${kw}"?` : `ما هو "${kw}"؟`,
-        back: language === 'english'
-          ? `"${kw}" is a key concept in this topic. Add your OpenAI key for real definitions.`
-          : `"${kw}" هو مفهوم أساسي في هذا الموضوع. أضف مفتاح OpenAI للحصول على تعريف حقيقي.`,
-        subject,
-        tags: [subject, kw]
-      };
-    });
-  }
-  const langInstr = language === 'arabic' ? 'باللغة العربية' : language === 'english' ? 'in English' : 'بالعامية اللبنانية';
-  const prompt = `من النص التالي، استخرج ${count} مصطلح أو مفهوم رئيسي وأنشئ بطاقات تعليمية (flashcards) ${langInstr}.
-النص: ${text.substring(0, 3000)}
-أرجع JSON فقط: {"flashcards":[{"front":"السؤال أو المصطلح","back":"التعريف أو الإجابة","tags":["tag1"]}]}`;
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: [{ role: 'user', content: prompt }],
-    max_tokens: 2000,
-    temperature: 0.5,
-    response_format: { type: 'json_object' }
-  });
-  const parsed = JSON.parse(response.choices[0].message.content);
-  return (parsed.flashcards || []).map(f => ({ ...f, subject }));
-};
-
-const summarizeUrl = async (url, language = 'arabic') => {
-  if (isDemoMode) {
-    await new Promise(r => setTimeout(r, 700));
-    const demos = {
-      arabic: `**ملخص الرابط (تجريبي):**\n\nتم تحليل الرابط: \`${url}\`\n\nهذا وضع تجريبي. لتفعيل التلخيص الحقيقي:\n- أضف مفتاح OpenAI API في ملف \`.env\`\n- سيقوم الذكاء الاصطناعي بتلخيص محتوى الرابط تلقائياً`,
-      lebanese: `**ملخص الرابط (تجريبي):**\n\nحللنا الرابط: \`${url}\`\n\nهيدا وضع تجريبي. لتشغيل التلخيص الحقيقي ضيف مفتاح OpenAI.`,
-      english: `**URL Summary (Demo):**\n\nAnalyzed URL: \`${url}\`\n\nThis is demo mode. Add your OpenAI API key to enable real URL summarization.`
-    };
-    return demos[language] || demos.arabic;
-  }
-  const prompt = `Summarize the content of this URL clearly and concisely ${language === 'arabic' ? 'باللغة العربية' : language === 'english' ? 'in English' : 'بالعامية اللبنانية'}: ${url}`;
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: [{ role: 'user', content: prompt }],
-    max_tokens: 1000,
-    temperature: 0.5
-  });
-  return response.choices[0].message.content;
-};
-
-module.exports = { chatWithAI, generateQuizFromText, generateSummary, explainInLebanese, chatStream, generateFlashcardsFromText, summarizeUrl, isDemoMode };
+module.exports = { chatWithAI, generateQuizFromText, generateSummary, explainInLebanese, chatStream, isDemoMode };

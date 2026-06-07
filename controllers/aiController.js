@@ -1,6 +1,6 @@
 const Chat = require('../models/Chat');
 const User = require('../models/User');
-const { chatWithAI, generateSummary, explainInLebanese, chatStream, summarizeUrl } = require('../services/aiService');
+const { chatWithAI, generateSummary, explainInLebanese, chatStream } = require('../services/aiService');
 const { sendSuccess, sendError } = require('../utils/response');
 
 const sendMessage = async (req, res) => {
@@ -152,13 +152,6 @@ const explainConcept = async (req, res) => {
   sendSuccess(res, { explanation }, 'Concept explained successfully.');
 };
 
-const summarizeUrlEndpoint = async (req, res) => {
-  const { url, language } = req.body;
-  if (!url || !url.startsWith('http')) return sendError(res, 'Valid URL is required.', 400);
-  const summary = await summarizeUrl(url, language || 'arabic');
-  sendSuccess(res, { summary, url }, 'URL summarized successfully.');
-};
-
 module.exports = {
   sendMessage,
   streamMessage,
@@ -166,6 +159,5 @@ module.exports = {
   getChatById,
   deleteChat,
   summarize,
-  summarizeUrlEndpoint,
   explainConcept
 };

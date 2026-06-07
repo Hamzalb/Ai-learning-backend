@@ -1,7 +1,7 @@
 const express = require('express');
 const { body } = require('express-validator');
 const router = express.Router();
-const { sendMessage, streamMessage, getChats, getChatById, deleteChat, summarize, summarizeUrlEndpoint, explainConcept } = require('../controllers/aiController');
+const { sendMessage, streamMessage, getChats, getChatById, deleteChat, summarize, explainConcept } = require('../controllers/aiController');
 const { protect } = require('../middleware/auth');
 const { aiRateLimiter } = require('../middleware/rateLimiter');
 const validate = require('../middleware/validate');
@@ -33,13 +33,6 @@ router.post('/summarize',
   ],
   validate,
   summarize
-);
-
-router.post('/summarize-url',
-  aiRateLimiter,
-  [body('url').trim().isURL().withMessage('Valid URL is required')],
-  validate,
-  summarizeUrlEndpoint
 );
 
 router.post('/explain',

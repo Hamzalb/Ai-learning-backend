@@ -17,8 +17,6 @@ const aiRoutes = require('./routes/ai');
 const pdfRoutes = require('./routes/pdf');
 const quizRoutes = require('./routes/quiz');
 const userRoutes = require('./routes/user');
-const flashcardRoutes = require('./routes/flashcard');
-const teacherRoutes = require('./routes/teacher');
 
 const app = express();
 
@@ -49,8 +47,6 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/pdf', pdfRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/flashcards', flashcardRoutes);
-app.use('/api/teacher', teacherRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Lebanese AI Learning Platform API is running', timestamp: new Date().toISOString() });
