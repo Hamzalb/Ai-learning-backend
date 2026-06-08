@@ -66,8 +66,14 @@ const getGrades = async (req, res) => {
 const createGrade = async (req, res) => {
   const { studentId, subjectId, classroomId, type, score, maxScore, term, note } = req.body;
   const grade = await Grade.create({
-    studentId, subjectId, classroomId, type, score, maxScore: maxScore || 100, term, note,
-    teacherId: String(req.user._id), schoolId: String(req.user.schoolId)
+    studentId,
+    subjectId:  subjectId  || null,
+    classroomId,
+    type, score,
+    maxScore: maxScore || 100,
+    term, note,
+    teacherId: String(req.user._id),
+    schoolId:  String(req.user.schoolId)
   });
   sendSuccess(res, { grade }, 'Grade recorded.', 201);
 };
@@ -175,8 +181,14 @@ const getHomework = async (req, res) => {
 const createHomework = async (req, res) => {
   const { title, description, classroomId, subjectId, dueDate } = req.body;
   const hw = await Homework.create({
-    title, description, classroomId, subjectId, dueDate, submissions: [],
-    teacherId: String(req.user._id), schoolId: String(req.user.schoolId)
+    title,
+    description: description || '',
+    classroomId: classroomId || null,   // empty string → null (avoids ObjectId cast error)
+    subjectId:   subjectId   || null,
+    dueDate:     dueDate     || null,
+    submissions: [],
+    teacherId: String(req.user._id),
+    schoolId:  String(req.user.schoolId)
   });
   sendSuccess(res, { homework: hw }, 'Homework created.', 201);
 };

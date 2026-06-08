@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const gradeSchema = new mongoose.Schema({
   studentId:   { type: mongoose.Schema.Types.ObjectId, ref: 'User',      required: true },
-  subjectId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Subject',   required: true },
+  subjectId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Subject',   required: false, default: null },
   classroomId: { type: mongoose.Schema.Types.ObjectId, ref: 'Classroom', required: true },
   schoolId:    { type: mongoose.Schema.Types.ObjectId, ref: 'School',    default: null },
   teacherId:   { type: mongoose.Schema.Types.ObjectId, ref: 'User',      default: null },
