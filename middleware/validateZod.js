@@ -88,7 +88,7 @@ const upsertScheduleSchema = z.object({
 // ─── Teacher ──────────────────────────────────────────────────────────────────
 const createGradeSchema = z.object({
   studentId: oid,
-  subjectId: oid,
+  subjectId: z.string().optional(),
   classroomId: oid,
   type: z.enum(['quiz', 'midterm', 'final', 'homework', 'participation']),
   score: z.coerce.number().min(0),
@@ -112,7 +112,7 @@ const createQuizSchema = z.object({
 
 const createHomeworkSchema = z.object({
   title: str('Homework title'),
-  classroomId: oid,
+  classroomId: z.string().optional(),
   description: z.string().optional(),
   dueDate: z.string().optional(),
   subjectId: z.string().optional()
