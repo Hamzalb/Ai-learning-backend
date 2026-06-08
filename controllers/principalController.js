@@ -16,6 +16,19 @@ const getDashboardStats = async (req, res) => {
   sendSuccess(res, { stats: { classrooms: classrooms.length, subjects: subjects.length, teachers: teachers.length, unassigned } });
 };
 
+// People (teachers & students in the same school)
+const getTeachers = async (req, res) => {
+  const teachers = await User.find({ schoolId: schoolId(req), role: 'teacher', isActive: true })
+    .select('name email phone isActive');
+  sendSuccess(res, { teachers });
+};
+
+const getStudents = async (req, res) => {
+  const students = await User.find({ schoolId: schoolId(req), role: 'student', isActive: true })
+    .select('name email phone isActive');
+  sendSuccess(res, { students });
+};
+
 // Classrooms
 const getClassrooms = async (req, res) => {
   const classrooms = await Classroom.find({ schoolId: schoolId(req) });
@@ -128,6 +141,7 @@ const getPayslips = async (req, res) => {
 
 module.exports = {
   getDashboardStats,
+  getTeachers, getStudents,
   getClassrooms, createClassroom, updateClassroom, deleteClassroom, assignStudents, assignTeacher, getClassroomRoster,
   getSubjects, createSubject, updateSubject, deleteSubject,
   getSchedule, upsertSchedule,

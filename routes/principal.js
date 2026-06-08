@@ -8,6 +8,9 @@ router.use(protect, authorize('principal'));
 
 router.get('/dashboard', ctrl.getDashboardStats);
 
+router.get('/teachers', ctrl.getTeachers);
+router.get('/students', ctrl.getStudents);
+
 router.get('/classrooms', ctrl.getClassrooms);
 router.post('/classrooms', validateZod(schemas.createClassroomSchema), ctrl.createClassroom);
 router.put('/classrooms/:id', validateZod(schemas.createClassroomSchema.partial()), ctrl.updateClassroom);
